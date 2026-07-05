@@ -25,6 +25,7 @@ export default function ClaimSheet({
   const [splitMode, setSplitMode] = useState<"all" | "group">(item.splitMode);
   const [groupIds, setGroupIds] = useState<string[]>(item.groupIds ?? []);
   const [loading, setLoading] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const alreadyClaimed = item.claimedBy != null;
 
@@ -43,6 +44,22 @@ export default function ClaimSheet({
         splitMode,
         groupIds: splitMode === "group" ? groupIds : undefined,
       });
+      onDone();
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ลบรายการ — กดครั้งแรกเป็นขอยืนยัน กดซ้ำถึงลบจริง
+  async function removeItem() {
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.deleteItem(code, item.id);
       onDone();
       onClose();
     } finally {
@@ -141,6 +158,13 @@ export default function ClaimSheet({
           ยกเลิก claim
         </button>
       )}
+      <button
+        className={`btn ${confirmDelete ? "btn-danger-solid" : "btn-danger"}`}
+        disabled={loading}
+        onClick={removeItem}
+      >
+        {confirmDelete ? "แน่ใจนะ? กดอีกครั้งเพื่อลบ" : "ลบรายการนี้"}
+      </button>
     </BottomSheet>
   );
 }

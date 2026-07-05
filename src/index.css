@@ -181,6 +181,7 @@ body {
 .mt-lg { margin-top: 24px; }
 .center { text-align: center; }
 .btn-danger { background: #fff; color: var(--red); border: 1.5px solid var(--red); }
+.btn-danger-solid { background: var(--red); color: #fff; }
 .mini-btn {
   font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 10px;
   border: 1.5px solid var(--primary); background: #fff; color: var(--primary-dark); cursor: pointer;

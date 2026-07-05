@@ -60,6 +60,8 @@ export const api = {
     }),
   unclaimItem: (code: string, itemId: string) =>
     request(`/rooms/${code}/items/${itemId}/unclaim`, { method: "POST" }),
+  deleteItem: (code: string, itemId: string) =>
+    request(`/rooms/${code}/items/${itemId}`, { method: "DELETE" }),
 
   // groups
   createGroup: (code: string, body: { name: string; userIds: string[] }) =>
