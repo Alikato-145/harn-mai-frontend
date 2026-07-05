@@ -200,7 +200,14 @@ body {
 .sheet .grab { width: 40px; height: 4px; background: #e5e7eb; border-radius: 2px; margin: 0 auto 14px; }
 .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .sheet-head h3 { font-size: 17px; }
-.x { color: #9ca3af; font-size: 20px; cursor: pointer; }
+/* ปุ่มปิด — ทำเป็นวงกลมพื้นที่กด 40px ขยับเข้ามาจากขอบขวา ให้กดง่ายขึ้น */
+.x {
+  color: #6b7280; font-size: 17px; cursor: pointer;
+  width: 40px; height: 40px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: #f3f4f6;
+}
+.x:active { background: #e5e7eb; }
 
 /* toggle (splitMode) */
 .toggle { display: flex; gap: 8px; margin-bottom: 12px; }
