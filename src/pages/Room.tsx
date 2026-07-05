@@ -56,6 +56,8 @@ export default function Room() {
 
   const { room, members, groups, items } = data;
   const isHost = session?.userId === room.hostUserId;
+  const overlayOpen =
+    sheet !== null || claimItem !== null || manageGroupId !== null || showFinish;
 
   return (
     <div className="container">
@@ -166,22 +168,26 @@ export default function Room() {
         </button>
       )}
 
-      {/* actions */}
-      <button
-        className="fab"
-        onClick={() => setSheet("addItem")}
-        aria-label="เพิ่มรายการ"
-      >
-        +
-      </button>
-      <div className="sticky-bar">
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate(`/room/${code}/settlement`)}
-        >
-          ดูสรุปหารเงิน
-        </button>
-      </div>
+      {/* actions — ซ่อนตอนมี sheet/dialog เปิด กันปุ่มลอยทับแป้นพิมพ์ */}
+      {!overlayOpen && (
+        <>
+          <button
+            className="fab"
+            onClick={() => setSheet("addItem")}
+            aria-label="เพิ่มรายการ"
+          >
+            +
+          </button>
+          <div className="sticky-bar">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate(`/room/${code}/settlement`)}
+            >
+              ดูสรุปหารเงิน
+            </button>
+          </div>
+        </>
+      )}
 
       {/* sheets / dialogs */}
       {sheet === "addMember" && (

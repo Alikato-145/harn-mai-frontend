@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
+import { LIMITS, sanitizeText } from "../lib/sanitize";
 
 export default function AddItemSheet({
   code,
@@ -34,13 +35,15 @@ export default function AddItemSheet({
         placeholder="ชื่อรายการ *"
         value={name}
         autoFocus
-        onChange={(e) => setName(e.target.value)}
+        maxLength={LIMITS.itemName}
+        onChange={(e) => setName(sanitizeText(e.target.value, LIMITS.itemName))}
       />
       <input
         className="field"
         placeholder="โน๊ต (ไม่บังคับ)"
         value={note}
-        onChange={(e) => setNote(e.target.value)}
+        maxLength={LIMITS.note}
+        onChange={(e) => setNote(sanitizeText(e.target.value, LIMITS.note))}
       />
       <button
         className="btn btn-primary"

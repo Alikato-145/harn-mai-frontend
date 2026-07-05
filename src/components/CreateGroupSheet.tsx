@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
+import { LIMITS, sanitizeText } from "../lib/sanitize";
 import type { Member } from "../lib/types";
 
 export default function CreateGroupSheet({
@@ -43,7 +44,8 @@ export default function CreateGroupSheet({
         placeholder="เช่น กลุ่มเหล้า"
         value={name}
         autoFocus
-        onChange={(e) => setName(e.target.value)}
+        maxLength={LIMITS.groupName}
+        onChange={(e) => setName(sanitizeText(e.target.value, LIMITS.groupName))}
       />
       <label className="label">เลือกสมาชิก</label>
       <div className="check-list">

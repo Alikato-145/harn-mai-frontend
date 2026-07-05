@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
+import { LIMITS, sanitizePrice } from "../lib/sanitize";
 import type { ItemFull, Member, GroupFull } from "../lib/types";
 
 export default function ClaimSheet({
@@ -70,11 +71,12 @@ export default function ClaimSheet({
       <label className="label">ราคา (บาท) *</label>
       <input
         className="field"
-        type="number"
+        type="text"
         inputMode="decimal"
         placeholder="0"
         value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        maxLength={LIMITS.price}
+        onChange={(e) => setPrice(sanitizePrice(e.target.value))}
       />
 
       <label className="label">ใครจ่าย</label>

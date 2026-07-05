@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { storage } from "../lib/storage";
+import { LIMITS, sanitizeText, sanitizeCode } from "../lib/sanitize";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ export default function Landing() {
               placeholder="ใส่โค้ด 6 ตัว"
               value={code}
               maxLength={6}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              onChange={(e) => setCode(sanitizeCode(e.target.value, 6))}
             />
             <button
               className="btn btn-primary btn-auto"
@@ -88,14 +89,16 @@ export default function Landing() {
             className="field"
             placeholder="เช่น ทริปเชียงใหม่"
             value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
+            maxLength={LIMITS.roomName}
+            onChange={(e) => setRoomName(sanitizeText(e.target.value, LIMITS.roomName))}
           />
           <label className="label">ชื่อคุณ (เป็นสมาชิกคนแรก + host)</label>
           <input
             className="field"
             placeholder="เช่น นัส"
             value={hostName}
-            onChange={(e) => setHostName(e.target.value)}
+            maxLength={LIMITS.memberName}
+            onChange={(e) => setHostName(sanitizeText(e.target.value, LIMITS.memberName))}
           />
           <button
             className="btn btn-primary"

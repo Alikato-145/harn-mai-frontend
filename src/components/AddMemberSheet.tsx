@@ -1,6 +1,7 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
+import { LIMITS, sanitizeText } from "../lib/sanitize";
 
 export default function AddMemberSheet({
   code,
@@ -32,7 +33,8 @@ export default function AddMemberSheet({
         placeholder="ชื่อสมาชิก"
         value={name}
         autoFocus
-        onChange={(e) => setName(e.target.value)}
+        maxLength={LIMITS.memberName}
+        onChange={(e) => setName(sanitizeText(e.target.value, LIMITS.memberName))}
       />
       <button
         className="btn btn-primary"
