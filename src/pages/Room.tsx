@@ -10,6 +10,7 @@ import CreateGroupSheet from "../components/CreateGroupSheet";
 import ClaimSheet from "../components/ClaimSheet";
 import ManageGroupSheet from "../components/ManageGroupSheet";
 import FinishDialog from "../components/FinishDialog";
+import LoadingScreen from "../components/LoadingScreen";
 
 type Sheet = "addMember" | "addItem" | "createGroup" | null;
 
@@ -52,7 +53,7 @@ export default function Room() {
       </div>
     );
   }
-  if (!data) return <div className="container">กำลังโหลด…</div>;
+  if (!data) return <LoadingScreen message="กำลังโหลดห้อง…" />;
 
   const { room, members, groups, items } = data;
   const isHost = session?.userId === room.hostUserId;

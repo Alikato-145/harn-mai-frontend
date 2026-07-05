@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { money, buildSettlementText } from "../lib/format";
 import type { Settlement as SettlementType } from "../lib/types";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function Settlement() {
   const { code = "" } = useParams();
@@ -17,7 +18,7 @@ export default function Settlement() {
     api.getRoomFull(code).then((f) => setRoomName(f.room.name)).catch(() => {});
   }, [code]);
 
-  if (!data) return <div className="container">กำลังคำนวณ…</div>;
+  if (!data) return <LoadingScreen message="กำลังคำนวณ…" />;
 
   const text = buildSettlementText(roomName, data);
 

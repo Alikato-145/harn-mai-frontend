@@ -159,6 +159,23 @@ body {
   .fab { right: 16px; }
 }
 
+/* loading screen (ตอนรีโหลด/รอข้อมูล) */
+.loading-screen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; padding-bottom: 20vh;
+}
+.brand.sm { font-size: 24px; }
+.spinner {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3.5px solid var(--primary-soft); border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+.loading-text { color: var(--muted); font-size: 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.6s; }
+}
+
 /* utilities */
 .mt { margin-top: 12px; }
 .mt-lg { margin-top: 24px; }
