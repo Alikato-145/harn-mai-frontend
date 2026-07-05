@@ -6,7 +6,7 @@ export const LIMITS = {
   groupName: 30,
   itemName: 50,
   note: 100,
-  price: 9,
+  price: 15,
 } as const;
 
 const DISALLOWED = /[^a-zA-Z0-9฀-๿ .,\-_()/]/g;
