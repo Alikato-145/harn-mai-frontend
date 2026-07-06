@@ -23,8 +23,15 @@ export default function Room() {
   const [claimItem, setClaimItem] = useState<ItemFull | null>(null);
   const [manageGroupId, setManageGroupId] = useState<string | null>(null);
   const [showFinish, setShowFinish] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const session = storage.load();
+
+  function copyCode(codeStr: string) {
+    navigator.clipboard.writeText(codeStr);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   const load = useCallback(async () => {
     try {
@@ -65,11 +72,39 @@ export default function Room() {
       <div className="appbar">
         <span className="rname">{room.name}</span>
         <span
-          className="code-chip"
-          onClick={() => navigator.clipboard.writeText(room.code)}
+          className={`code-chip ${copied ? "copied" : ""}`}
+          onClick={() => copyCode(room.code)}
           title="แตะเพื่อคัดลอกโค้ด"
         >
-          {room.code}
+          {copied ? (
+            <svg
+              className="chip-ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg
+              className="chip-ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          )}
+          {copied ? "คัดลอกแล้ว" : room.code}
         </span>
       </div>
 

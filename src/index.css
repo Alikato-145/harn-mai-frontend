@@ -103,10 +103,14 @@ body {
 }
 .rname { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
 .code-chip {
+  display: inline-flex; align-items: center; gap: 6px;
   background: transparent; color: var(--ink); font-weight: 700;
   font-size: 13px; letter-spacing: 1.5px; font-family: ui-monospace, "SF Mono", monospace;
   padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
 }
+.code-chip .chip-ic { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.65; }
+.code-chip.copied { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
+.code-chip.copied .chip-ic { opacity: 1; }
 
 /* sections */
 .sec-title {
