@@ -7,6 +7,7 @@ export const LIMITS = {
   itemName: 50,
   note: 100,
   price: 15,
+  phone: 10,
 } as const;
 
 const DISALLOWED = /[^a-zA-Z0-9฀-๿ .,\-_()/]/g;
@@ -18,6 +19,16 @@ export function sanitizeText(value: string, maxLength: number): string {
 // โค้ดห้อง: ตัวอักษรอังกฤษพิมพ์ใหญ่กับตัวเลขเท่านั้น
 export function sanitizeCode(value: string, maxLength: number): string {
   return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, maxLength);
+}
+
+// เบอร์โทร: ตัวเลขล้วน สูงสุด 10 หลัก
+export function sanitizePhone(value: string): string {
+  return value.replace(/[^0-9]/g, "").slice(0, LIMITS.phone);
+}
+
+// เบอร์ถูกต้อง = ว่าง (ไม่ใส่) หรือ 0 นำหน้า + 10 หลัก (ตรงกับ backend ^0[0-9]{9}$)
+export function isValidPhone(value: string): boolean {
+  return value === "" || /^0[0-9]{9}$/.test(value);
 }
 
 // ราคา: ตัวเลข + จุดทศนิยมจุดเดียว

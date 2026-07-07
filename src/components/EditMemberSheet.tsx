@@ -1,19 +1,22 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
+import type { Member } from "../lib/types";
 import { LIMITS, sanitizeText, sanitizePhone, isValidPhone } from "../lib/sanitize";
 
-export default function AddMemberSheet({
+export default function EditMemberSheet({
   code,
+  member,
   onClose,
   onDone,
 }: {
   code: string;
+  member: Member;
   onClose: () => void;
   onDone: () => void; // เรียกหลังสำเร็จ (ให้ parent refetch)
 }) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState(member.name);
+  const [phone, setPhone] = useState(member.phone ?? "");
   const [loading, setLoading] = useState(false);
 
   const phoneOk = isValidPhone(phone);
@@ -21,8 +24,11 @@ export default function AddMemberSheet({
   async function submit() {
     setLoading(true);
     try {
-      // ส่ง phone เฉพาะตอนใส่จริง (ว่าง = ไม่มีเบอร์)
-      await api.addUser(code, name.trim(), phone || undefined);
+      // ส่ง phone เฉพาะตอนมีค่า (เว้นว่าง = คงเบอร์เดิม, ยังลบเบอร์ผ่านหน้านี้ไม่ได้)
+      await api.updateUser(code, member.id, {
+        name: name.trim(),
+        ...(phone ? { phone } : {}),
+      });
       onDone();
       onClose();
     } finally {
@@ -31,7 +37,7 @@ export default function AddMemberSheet({
   }
 
   return (
-    <BottomSheet title="เพิ่มสมาชิก" onClose={onClose}>
+    <BottomSheet title="แก้ไขโปรไฟล์" onClose={onClose}>
       <input
         className="field"
         placeholder="ชื่อสมาชิก"
@@ -56,7 +62,7 @@ export default function AddMemberSheet({
         disabled={!name.trim() || !phoneOk || loading}
         onClick={submit}
       >
-        เพิ่ม
+        บันทึก
       </button>
     </BottomSheet>
   );

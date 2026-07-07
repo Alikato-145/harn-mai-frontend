@@ -12,6 +12,7 @@ export type Room = {
 export type Member = {
   id: string;
   name: string;
+  phone: string | null;
   roomId: string;
   joinedAt: string | null;
 };
@@ -58,5 +59,7 @@ export type Settlement = {
     toId: string;
     toName: string;
     amount: number;
+    toPhone: string | null;
+    promptPayPayload: string | null;
   }[];
 };

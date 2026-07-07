@@ -32,11 +32,23 @@ export const api = {
     }),
 
   // users
-  addUser: (code: string, name: string) =>
-    request<{ userId: string; name: string }>(`/rooms/${code}/users`, {
-      method: "POST",
-      body: JSON.stringify({ name }),
-    }),
+  addUser: (code: string, name: string, phone?: string) =>
+    request<{ userId: string; name: string; phone: string | null }>(
+      `/rooms/${code}/users`,
+      {
+        method: "POST",
+        body: JSON.stringify(phone ? { name, phone } : { name }),
+      },
+    ),
+  updateUser: (
+    code: string,
+    userId: string,
+    body: { name?: string; phone?: string },
+  ) =>
+    request<{ userId: string; name: string; phone: string | null }>(
+      `/rooms/${code}/users/${userId}`,
+      { method: "PATCH", body: JSON.stringify(body) },
+    ),
 
   // items
   addItem: (code: string, body: { name: string; note?: string }) =>

@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { storage } from "../lib/storage";
 import { money } from "../lib/format";
-import type { RoomFull, ItemFull } from "../lib/types";
+import type { RoomFull, ItemFull, Member } from "../lib/types";
 import AddMemberSheet from "../components/AddMemberSheet";
+import EditMemberSheet from "../components/EditMemberSheet";
 import AddItemSheet from "../components/AddItemSheet";
 import CreateGroupSheet from "../components/CreateGroupSheet";
 import ClaimSheet from "../components/ClaimSheet";
@@ -22,6 +23,7 @@ export default function Room() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [claimItem, setClaimItem] = useState<ItemFull | null>(null);
   const [manageGroupId, setManageGroupId] = useState<string | null>(null);
+  const [editMember, setEditMember] = useState<Member | null>(null);
   const [showFinish, setShowFinish] = useState(false);
 
   const session = storage.load();
@@ -58,7 +60,11 @@ export default function Room() {
   const { room, members, groups, items } = data;
   const isHost = session?.userId === room.hostUserId;
   const overlayOpen =
-    sheet !== null || claimItem !== null || manageGroupId !== null || showFinish;
+    sheet !== null ||
+    claimItem !== null ||
+    manageGroupId !== null ||
+    editMember !== null ||
+    showFinish;
 
   return (
     <div className="container">
@@ -84,7 +90,12 @@ export default function Room() {
       </div>
       <div className="members">
         {members.map((m) => (
-          <div className="avatar" key={m.id}>
+          <div
+            className="avatar"
+            key={m.id}
+            onClick={() => setEditMember(m)}
+            title="แตะเพื่อแก้ชื่อ/เบอร์"
+          >
             <div className="circ">{m.name.charAt(0)}</div>
             <small>{m.name}</small>
           </div>
@@ -193,6 +204,14 @@ export default function Room() {
       {/* sheets / dialogs */}
       {sheet === "addMember" && (
         <AddMemberSheet code={code} onClose={() => setSheet(null)} onDone={load} />
+      )}
+      {editMember && (
+        <EditMemberSheet
+          code={code}
+          member={editMember}
+          onClose={() => setEditMember(null)}
+          onDone={load}
+        />
       )}
       {sheet === "addItem" && (
         <AddItemSheet code={code} onClose={() => setSheet(null)} onDone={load} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import { api } from "../lib/api";
 import { money, buildSettlementText } from "../lib/format";
 import type { Settlement as SettlementType } from "../lib/types";
@@ -11,6 +12,7 @@ export default function Settlement() {
   const [data, setData] = useState<SettlementType | null>(null);
   const [roomName, setRoomName] = useState("");
   const [copied, setCopied] = useState(false);
+  const [openTx, setOpenTx] = useState<number | null>(null); // transaction ที่กาง QR อยู่
 
   useEffect(() => {
     api.settlement(code).then(setData).catch(() => {});
@@ -74,14 +76,39 @@ export default function Settlement() {
       {data.transactions.length === 0 && (
         <p className="muted small">ไม่มีรายการต้องโอน</p>
       )}
-      {data.transactions.map((t, i) => (
-        <div className="tx" key={i}>
-          <span>{t.fromName}</span>
-          <span className="arrow">→</span>
-          <span>{t.toName}</span>
-          <span className="tx-amt">{money(t.amount)}</span>
-        </div>
-      ))}
+      {data.transactions.map((t, i) => {
+        const open = openTx === i;
+        return (
+          <div className="tx-acc" key={i}>
+            <div
+              className={`tx tx-head ${open ? "open" : ""}`}
+              onClick={() => setOpenTx(open ? null : i)}
+            >
+              <span>{t.fromName}</span>
+              <span className="arrow">→</span>
+              <span>{t.toName}</span>
+              <span className="tx-amt">{money(t.amount)}</span>
+              <span className={`chev ${open ? "open" : ""}`}>⌄</span>
+            </div>
+            {open && (
+              <div className="tx-panel">
+                {t.promptPayPayload ? (
+                  <>
+                    <QRCodeSVG value={t.promptPayPayload} size={180} />
+                    <p className="muted small">
+                      สแกนพร้อมเพย์เพื่อโอนให้ {t.toName} · {money(t.amount)}
+                    </p>
+                  </>
+                ) : (
+                  <p className="muted small">
+                    {t.toName} ยังไม่มีเบอร์ PromptPay — ให้เจ้าตัวแตะโปรไฟล์ในห้องเพื่อเพิ่มเบอร์
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {/* export */}
       <pre className="export-box mt">{text}</pre>
