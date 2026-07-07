@@ -301,8 +301,8 @@ body {
 .tx-acc .tx { margin-bottom: 0; cursor: pointer; user-select: none; }
 .tx-head.open { border-radius: 12px 12px 0 0; }
 .tx-head .chev {
-  margin-left: 6px; color: #94a3b8; font-weight: 700;
-  transition: transform 0.15s ease;
+  width: 16px; height: 16px; margin-left: 6px; flex-shrink: 0;
+  color: #94a3b8; transition: transform 0.15s ease;
 }
 .tx-head .chev.open { transform: rotate(180deg); }
 .tx-panel {
