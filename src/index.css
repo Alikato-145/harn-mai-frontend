@@ -31,7 +31,7 @@ body {
   margin: 0 auto;
   min-height: 100vh;
   background: #f6f4ee;
-  padding: 20px 18px 100px;
+  padding: 20px 18px 120px;
   position: relative;
 }
 
@@ -52,10 +52,24 @@ body {
 .brand .dot { color: var(--primary); }
 .tagline { color: var(--muted); font-size: 14px; margin-bottom: 30px; }
 
-/* เครดิตผู้ทำ (Landing) — เล็ก กระชับ + วงแหวนไล่สีแบบสตอรี่ IG */
+/* footer เครดิตผู้ทำ — fixed ล่างจอ โชว์ทุกหน้า */
+.app-footer {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: center;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  z-index: 15; pointer-events: none; /* ให้คลิกทะลุไป content ได้ ยกเว้นตัว badge */
+}
+.app-footer .credit-badge {
+  pointer-events: auto;
+  padding: 5px 13px; border-radius: 999px;
+  background: rgba(246, 244, 238, 0.82); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); /* อ่านง่ายตอน content เลื่อนผ่านข้างหลัง */
+}
+
+/* เครดิตผู้ทำ — เล็ก กระชับ + วงแหวนไล่สีแบบสตอรี่ IG */
 .credit-badge {
-  display: inline-flex; align-items: center; align-self: center; gap: 8px;
-  margin-top: 32px; color: var(--muted); font-size: 12.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 12.5px;
   text-decoration: none; transition: color 0.15s ease;
 }
 .credit-badge:hover { color: var(--ink); }
@@ -176,13 +190,13 @@ body {
 
 /* fab + sticky */
 .fab {
-  position: fixed; right: calc(50% - 240px + 18px); bottom: 82px;
+  position: fixed; right: calc(50% - 240px + 18px); bottom: 128px;
   width: 52px; height: 52px; border-radius: 50%; background: var(--primary);
   color: #fff; font-size: 26px; line-height: 1; border: none; cursor: pointer;
   box-shadow: 0 4px 14px rgba(18, 77, 49, 0.28); z-index: 20;
 }
 .sticky-bar {
-  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  position: fixed; bottom: 46px; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 480px; padding: 12px 16px;
   background: linear-gradient(transparent, #f1f5f4 30%);
 }

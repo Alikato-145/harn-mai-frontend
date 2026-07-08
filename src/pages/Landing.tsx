@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { storage } from "../lib/storage";
 import { LIMITS, sanitizeText, sanitizeCode } from "../lib/sanitize";
-import CreditBadge from "../components/CreditBadge";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -122,8 +121,6 @@ export default function Landing() {
           </button>
         </>
       )}
-
-      <CreditBadge />
     </div>
   );
 }

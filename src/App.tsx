@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Room from "./pages/Room";
 import Settlement from "./pages/Settlement";
+import CreditBadge from "./components/CreditBadge";
 
 export default function App() {
   return (
@@ -11,6 +12,10 @@ export default function App() {
         <Route path="/room/:idRoom" element={<Room />} />
         <Route path="/room/:idRoom/settlement" element={<Settlement />} />
       </Routes>
+      {/* footer เดียว โชว์ทุกหน้า (fixed ล่างจอ) */}
+      <footer className="app-footer">
+        <CreditBadge />
+      </footer>
     </BrowserRouter>
   );
 }
