@@ -18,8 +18,9 @@ export default function Landing() {
     setError("");
     setLoading(true);
     try {
-      await api.getRoomFull(code.trim().toUpperCase());
-      navigate(`/room/${code.trim().toUpperCase()}`);
+      // เช็คว่ามีจริง + เอา roomId (UUID) มาใช้เป็น path แทน code
+      const full = await api.getRoomFull(code.trim().toUpperCase());
+      navigate(`/room/${full.room.id}`);
     } catch {
       setError("ไม่พบห้องนี้ ลองเช็คโค้ดอีกครั้ง");
     } finally {
@@ -32,12 +33,12 @@ export default function Landing() {
     setError("");
     setLoading(true);
     try {
-      const { code: newCode, userId } = await api.createRoom({
+      const { code: newCode, userId, roomId } = await api.createRoom({
         roomName,
         hostName,
       });
       storage.save({ code: newCode, userId, isHost: true });
-      navigate(`/room/${newCode}`);
+      navigate(`/room/${roomId}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "สร้างห้องไม่สำเร็จ");
     } finally {

@@ -7,14 +7,21 @@ import type { Settlement as SettlementType } from "../lib/types";
 import LoadingScreen from "../components/LoadingScreen";
 
 export default function Settlement() {
-  const { code = "" } = useParams();
+  const { idRoom = "" } = useParams();
   const navigate = useNavigate();
+  const [code, setCode] = useState(""); // resolve จาก idRoom ก่อน
   const [data, setData] = useState<SettlementType | null>(null);
   const [roomName, setRoomName] = useState("");
   const [copied, setCopied] = useState(false);
   const [openTx, setOpenTx] = useState<number | null>(null); // transaction ที่กาง QR อยู่
 
+  // idRoom (UUID) → code
   useEffect(() => {
+    api.getRoomById(idRoom).then((r) => setCode(r.code)).catch(() => {});
+  }, [idRoom]);
+
+  useEffect(() => {
+    if (!code) return;
     api.settlement(code).then(setData).catch(() => {});
     // เอาชื่อห้องไว้ทำ export text
     api.getRoomFull(code).then((f) => setRoomName(f.room.name)).catch(() => {});
@@ -34,7 +41,7 @@ export default function Settlement() {
     <div className="container">
       <div className="appbar">
         <span className="rname">สรุปหารเงิน</span>
-        <span className="x" onClick={() => navigate(`/room/${code}`)}>
+        <span className="x" onClick={() => navigate(`/room/${idRoom}`)}>
           ✕
         </span>
       </div>

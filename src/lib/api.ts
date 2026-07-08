@@ -1,4 +1,4 @@
-import type { RoomFull, Settlement, ItemFull } from "./types";
+import type { Room, RoomFull, Settlement, ItemFull } from "./types";
 
 const API = import.meta.env.VITE_API_URL as string;
 
@@ -20,10 +20,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   // rooms
   createRoom: (body: { roomName: string; hostName: string }) =>
-    request<{ code: string; userId: string }>("/rooms", {
+    request<{ code: string; userId: string; roomId: string }>("/rooms", {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  // หาห้องจาก roomId (UUID) → คืน room row (มี code) ไว้ resolve code จาก URL
+  getRoomById: (roomId: string) => request<Room>(`/rooms/id/${roomId}`),
   getRoomFull: (code: string) => request<RoomFull>(`/rooms/${code}/full`),
   finish: (code: string, userId: string) =>
     request<{ message: string }>(`/rooms/${code}/finish`, {

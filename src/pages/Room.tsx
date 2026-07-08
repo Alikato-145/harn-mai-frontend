@@ -16,8 +16,9 @@ import LoadingScreen from "../components/LoadingScreen";
 type Sheet = "addMember" | "addItem" | "createGroup" | null;
 
 export default function Room() {
-  const { code = "" } = useParams();
+  const { idRoom = "" } = useParams();
   const navigate = useNavigate();
+  const [code, setCode] = useState(""); // resolve จาก idRoom (UUID) ก่อน แล้วค่อยใช้กับ endpoint by-code
   const [data, setData] = useState<RoomFull | null>(null);
   const [error, setError] = useState("");
   const [sheet, setSheet] = useState<Sheet>(null);
@@ -35,9 +36,18 @@ export default function Room() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  // silent = true สำหรับ background poll → ไม่เด้งหน้า error ถ้าพลาดแวบเดียว (เน็ต/429)
+  // ขั้นแรก: แปลง idRoom (UUID จาก URL) → code จริง ยิงครั้งเดียวตอนเข้าห้อง
+  useEffect(() => {
+    api
+      .getRoomById(idRoom)
+      .then((room) => setCode(room.code))
+      .catch(() => setError("ห้องนี้ถูกจบไปแล้ว หรือไม่มีอยู่"));
+  }, [idRoom]);
+
+  // silent = true สำหรับ background refetch → ไม่เด้งหน้า error ถ้าพลาดแวบเดียว (เน็ต/429)
   const load = useCallback(
     async (opts?: { silent?: boolean }) => {
+      if (!code) return; // ยังไม่ได้ resolve code
       try {
         setData(await api.getRoomFull(code));
       } catch {
@@ -47,8 +57,9 @@ export default function Room() {
     [code],
   );
 
-  // auto-refresh (interim ก่อนทำ realtime): poll ทุก 5 วิ + refetch ทันทีตอนกลับมาโฟกัสแอป
+  // พอได้ code แล้ว: โหลดข้อมูล + เปิดสาย SSE (realtime)
   useEffect(() => {
+    if (!code) return;
     load();
     const es = new EventSource(
       `${import.meta.env.VITE_API_URL}/rooms/${code}/events`,
@@ -56,7 +67,7 @@ export default function Room() {
     es.onmessage = () => load({ silent: true }); // มีสัญญาณ → refetch
     // EventSource รีคอนเน็คเองอัตโนมัติถ้าสายหลุด (ข้อดีใหญ่)
     return () => es.close();
-  }, [code]);
+  }, [code, load]);
 
   function goHome() {
     storage.clear();
@@ -242,7 +253,7 @@ export default function Room() {
           <div className="sticky-bar">
             <button
               className="btn btn-primary"
-              onClick={() => navigate(`/room/${code}/settlement`)}
+              onClick={() => navigate(`/room/${idRoom}/settlement`)}
             >
               ดูสรุปหารเงิน
             </button>
