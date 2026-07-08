@@ -35,17 +35,28 @@ export default function Room() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  const load = useCallback(async () => {
-    try {
-      setData(await api.getRoomFull(code));
-    } catch {
-      setError("ห้องนี้ถูกจบไปแล้ว หรือไม่มีอยู่");
-    }
-  }, [code]);
+  // silent = true สำหรับ background poll → ไม่เด้งหน้า error ถ้าพลาดแวบเดียว (เน็ต/429)
+  const load = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      try {
+        setData(await api.getRoomFull(code));
+      } catch {
+        if (!opts?.silent) setError("ห้องนี้ถูกจบไปแล้ว หรือไม่มีอยู่");
+      }
+    },
+    [code],
+  );
 
+  // auto-refresh (interim ก่อนทำ realtime): poll ทุก 5 วิ + refetch ทันทีตอนกลับมาโฟกัสแอป
   useEffect(() => {
     load();
-  }, [load]);
+    const es = new EventSource(
+      `${import.meta.env.VITE_API_URL}/rooms/${code}/events`,
+    );
+    es.onmessage = () => load({ silent: true }); // มีสัญญาณ → refetch
+    // EventSource รีคอนเน็คเองอัตโนมัติถ้าสายหลุด (ข้อดีใหญ่)
+    return () => es.close();
+  }, [code]);
 
   function goHome() {
     storage.clear();
@@ -210,7 +221,10 @@ export default function Room() {
       })}
 
       {isHost && (
-        <button className="btn btn-danger mt-lg" onClick={() => setShowFinish(true)}>
+        <button
+          className="btn btn-danger mt-lg"
+          onClick={() => setShowFinish(true)}
+        >
           จบห้อง (ลบข้อมูลทั้งหมด)
         </button>
       )}
@@ -238,7 +252,11 @@ export default function Room() {
 
       {/* sheets / dialogs */}
       {sheet === "addMember" && (
-        <AddMemberSheet code={code} onClose={() => setSheet(null)} onDone={load} />
+        <AddMemberSheet
+          code={code}
+          onClose={() => setSheet(null)}
+          onDone={load}
+        />
       )}
       {editMember && (
         <EditMemberSheet
@@ -249,7 +267,11 @@ export default function Room() {
         />
       )}
       {sheet === "addItem" && (
-        <AddItemSheet code={code} onClose={() => setSheet(null)} onDone={load} />
+        <AddItemSheet
+          code={code}
+          onClose={() => setSheet(null)}
+          onDone={load}
+        />
       )}
       {sheet === "createGroup" && (
         <CreateGroupSheet
