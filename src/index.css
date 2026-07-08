@@ -144,6 +144,7 @@ body {
   padding: 4px 2px 14px; border-bottom: 1px solid var(--line); margin-bottom: 12px;
 }
 .rname { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+.appbar-right { display: flex; align-items: center; gap: 8px; }
 .code-chip {
   display: inline-flex; align-items: center; gap: 6px;
   background: transparent; color: var(--ink); font-weight: 700;
@@ -153,6 +154,13 @@ body {
 .code-chip .chip-ic { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.65; }
 .code-chip.copied { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
 .code-chip.copied .chip-ic { opacity: 1; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--line); background: transparent; color: var(--red); cursor: pointer;
+}
+.icon-btn svg { width: 17px; height: 17px; }
+.icon-btn:active { background: #fdf2f0; }
 
 /* sections */
 .sec-title {
@@ -161,6 +169,12 @@ body {
 }
 .sec-title .count { color: var(--muted); font-weight: 500; font-size: 12px; }
 .link { color: var(--primary); font-weight: 600; font-size: 13px; cursor: pointer; }
+
+.section-panel { border-radius: 16px; padding: 10px 12px 14px; margin-bottom: 18px; }
+.section-panel .sec-title { margin: 0 0 10px; }
+.section-panel--members { background: var(--primary-soft); }
+.section-panel--groups { background: #f3f1ea; }
+.section-panel--items { background: #eef1f6; }
 
 /* members */
 .members { display: flex; gap: 14px; overflow-x: auto; padding: 4px 0; }
@@ -188,21 +202,11 @@ body {
 .pill-green { background: var(--primary-soft); color: var(--primary-dark); }
 .pill-gray { background: #e5e7eb; color: #6b7280; }
 
-/* fab + sticky */
-.fab {
-  position: fixed; right: calc(50% - 240px + 18px); bottom: 128px;
-  width: 52px; height: 52px; border-radius: 50%; background: var(--primary);
-  color: #fff; font-size: 26px; line-height: 1; border: none; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(18, 77, 49, 0.28); z-index: 20;
-}
+/* sticky */
 .sticky-bar {
   position: fixed; bottom: 46px; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 480px; padding: 12px 16px;
   background: linear-gradient(transparent, #f1f5f4 30%);
-}
-
-@media (max-width: 512px) {
-  .fab { right: 16px; }
 }
 
 /* loading screen (ตอนรีโหลด/รอข้อมูล) */
