@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { storage } from "../lib/storage";
 import { LIMITS, sanitizeText, sanitizeCode } from "../lib/sanitize";
+import CreditBadge from "../components/CreditBadge";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -33,7 +34,11 @@ export default function Landing() {
     setError("");
     setLoading(true);
     try {
-      const { code: newCode, userId, roomId } = await api.createRoom({
+      const {
+        code: newCode,
+        userId,
+        roomId,
+      } = await api.createRoom({
         roomName,
         hostName,
       });
@@ -52,7 +57,7 @@ export default function Landing() {
         harnmai<span className="dot">.</span>
       </div>
       <div className="tagline">
-        หารไหม — หารบิลเท่ากัน/แยกกันกับเพื่อนๆ สร้างห้องได้เลย
+        หารไหม — หารบิลเท่ากัน/แยกกลุ่มหารกันกับเพื่อนๆ สร้างห้องได้เลย
       </div>
 
       {error && <div className="banner-error">{error}</div>}
@@ -91,7 +96,9 @@ export default function Landing() {
             placeholder="เช่น ทริปเชียงใหม่"
             value={roomName}
             maxLength={LIMITS.roomName}
-            onChange={(e) => setRoomName(sanitizeText(e.target.value, LIMITS.roomName))}
+            onChange={(e) =>
+              setRoomName(sanitizeText(e.target.value, LIMITS.roomName))
+            }
           />
           <label className="label">ชื่อคุณ (เป็นสมาชิกคนแรก + host)</label>
           <input
@@ -99,7 +106,9 @@ export default function Landing() {
             placeholder="เช่น นัส"
             value={hostName}
             maxLength={LIMITS.memberName}
-            onChange={(e) => setHostName(sanitizeText(e.target.value, LIMITS.memberName))}
+            onChange={(e) =>
+              setHostName(sanitizeText(e.target.value, LIMITS.memberName))
+            }
           />
           <button
             className="btn btn-primary"
@@ -113,6 +122,8 @@ export default function Landing() {
           </button>
         </>
       )}
+
+      <CreditBadge />
     </div>
   );
 }
