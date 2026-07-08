@@ -26,6 +26,8 @@ export const api = {
     }),
   // หาห้องจาก roomId (UUID) → คืน room row (มี code) ไว้ resolve code จาก URL
   getRoomById: (roomId: string) => request<Room>(`/rooms/id/${roomId}`),
+  // หาห้องจาก code (เส้นเบา + rate limit เข้ม) → ใช้ตอน join เพื่อเอา room.id ไป navigate
+  getRoom: (code: string) => request<Room>(`/rooms/${code}`),
   getRoomFull: (code: string) => request<RoomFull>(`/rooms/${code}/full`),
   finish: (code: string, userId: string) =>
     request<{ message: string }>(`/rooms/${code}/finish`, {

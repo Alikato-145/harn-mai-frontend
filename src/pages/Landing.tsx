@@ -18,9 +18,9 @@ export default function Landing() {
     setError("");
     setLoading(true);
     try {
-      // เช็คว่ามีจริง + เอา roomId (UUID) มาใช้เป็น path แทน code
-      const full = await api.getRoomFull(code.trim().toUpperCase());
-      navigate(`/room/${full.room.id}`);
+      // เช็คว่ามีจริง (เส้นเบา by-code) + เอา room.id ไปใช้เป็น path แทน code
+      const room = await api.getRoom(code.trim().toUpperCase());
+      navigate(`/room/${room.id}`);
     } catch {
       setError("ไม่พบห้องนี้ ลองเช็คโค้ดอีกครั้ง");
     } finally {
