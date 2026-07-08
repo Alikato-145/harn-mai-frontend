@@ -99,166 +99,180 @@ export default function Room() {
     <div className="container">
       <div className="appbar">
         <span className="rname">{room.name}</span>
-        <span
-          className={`code-chip ${copied ? "copied" : ""}`}
-          onClick={() => copyCode(room.code)}
-          title="แตะเพื่อคัดลอกโค้ด"
-        >
-          {copied ? (
-            <svg
-              className="chip-ic"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+        <div className="appbar-right">
+          <span
+            className={`code-chip ${copied ? "copied" : ""}`}
+            onClick={() => copyCode(room.code)}
+            title="แตะเพื่อคัดลอกโค้ด"
+          >
+            {copied ? (
+              <svg
+                className="chip-ic"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : (
+              <svg
+                className="chip-ic"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            )}
+            {copied ? "คัดลอกแล้ว" : room.code}
+          </span>
+          {isHost && (
+            <button
+              className="icon-btn"
+              onClick={() => setShowFinish(true)}
+              title="จบห้อง"
+              aria-label="จบห้อง"
             >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg
-              className="chip-ic"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-            </svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                <line x1="12" y1="2" x2="12" y2="12" />
+              </svg>
+            </button>
           )}
-          {copied ? "คัดลอกแล้ว" : room.code}
-        </span>
+        </div>
       </div>
 
       {/* สมาชิก */}
-      <div className="sec-title">
-        <span>
-          สมาชิก <span className="count">{members.length}</span>
-        </span>
-        <span className="link" onClick={() => setSheet("addMember")}>
-          + เพิ่มชื่อ
-        </span>
-      </div>
-      <div className="members">
-        {members.map((m) => (
-          <div
-            className="avatar"
-            key={m.id}
-            onClick={() => setEditMember(m)}
-            title="แตะเพื่อแก้ชื่อ/เบอร์"
-          >
-            <div className="circ">{m.name.charAt(0)}</div>
-            <small>{m.name}</small>
-          </div>
-        ))}
+      <div className="section-panel section-panel--members">
+        <div className="sec-title">
+          <span>
+            สมาชิก <span className="count">{members.length}</span>
+          </span>
+          <span className="link" onClick={() => setSheet("addMember")}>
+            + เพิ่มชื่อ
+          </span>
+        </div>
+        <div className="members">
+          {members.map((m) => (
+            <div
+              className="avatar"
+              key={m.id}
+              onClick={() => setEditMember(m)}
+              title="แตะเพื่อแก้ชื่อ/เบอร์"
+            >
+              <div className="circ">{m.name.charAt(0)}</div>
+              <small>{m.name}</small>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* กลุ่มย่อย */}
-      <div className="sec-title">
-        <span>
-          กลุ่มย่อย <span className="count">{groups.length}</span>
-        </span>
-        <span className="link" onClick={() => setSheet("createGroup")}>
-          + สร้างกลุ่ม
-        </span>
-      </div>
-      {groups.length === 0 && <p className="muted small">ยังไม่มีกลุ่ม</p>}
-      <div className="group-list">
-        {groups.map((g) => (
-          <div
-            className="group-card"
-            key={g.id}
-            onClick={() => setManageGroupId(g.id)}
-          >
-            <div className="group-head">
-              <span className="group-name">{g.name}</span>
-              <span className="manage-link">จัดการ ›</span>
+      <div className="section-panel section-panel--groups">
+        <div className="sec-title">
+          <span>
+            กลุ่มย่อย <span className="count">{groups.length}</span>
+          </span>
+          <span className="link" onClick={() => setSheet("createGroup")}>
+            + สร้างกลุ่ม
+          </span>
+        </div>
+        {groups.length === 0 && <p className="muted small">ยังไม่มีกลุ่ม</p>}
+        <div className="group-list">
+          {groups.map((g) => (
+            <div
+              className="group-card"
+              key={g.id}
+              onClick={() => setManageGroupId(g.id)}
+            >
+              <div className="group-head">
+                <span className="group-name">{g.name}</span>
+                <span className="manage-link">จัดการ ›</span>
+              </div>
+              <div className="member-tags">
+                {g.members.length === 0 && (
+                  <span className="muted small">ยังไม่มีสมาชิก</span>
+                )}
+                {g.members.map((m) => (
+                  <span className="member-tag sm" key={m.userId}>
+                    {m.name}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="member-tags">
-              {g.members.length === 0 && (
-                <span className="muted small">ยังไม่มีสมาชิก</span>
-              )}
-              {g.members.map((m) => (
-                <span className="member-tag sm" key={m.userId}>
-                  {m.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* รายการ */}
-      <div className="sec-title">
-        <span>
-          รายการ <span className="count">{items.length}</span>
-        </span>
-      </div>
-      {items.length === 0 && <p className="muted small">ยังไม่มีรายการ</p>}
-      {items.map((it) => {
-        const claimed = it.claimedBy != null;
-        return (
-          <div
-            className={`card ${claimed ? "item-claimed" : "item-pending"}`}
-            key={it.id}
-            onClick={() => setClaimItem(it)}
-          >
-            <div className="row">
-              <span className="item-name">{it.name}</span>
-              {claimed ? (
-                <span className="price">{money(it.price ?? 0)}</span>
-              ) : (
-                <button className="mini-btn">claim</button>
+      <div className="section-panel section-panel--items">
+        <div className="sec-title">
+          <span>
+            รายการ <span className="count">{items.length}</span>
+          </span>
+          <span className="link" onClick={() => setSheet("addItem")}>
+            + เพิ่มรายการ
+          </span>
+        </div>
+        {items.length === 0 && <p className="muted small">ยังไม่มีรายการ</p>}
+        {items.map((it) => {
+          const claimed = it.claimedBy != null;
+          return (
+            <div
+              className={`card ${claimed ? "item-claimed" : "item-pending"}`}
+              key={it.id}
+              onClick={() => setClaimItem(it)}
+            >
+              <div className="row">
+                <span className="item-name">{it.name}</span>
+                {claimed ? (
+                  <span className="price">{money(it.price ?? 0)}</span>
+                ) : (
+                  <button className="mini-btn">claim</button>
+                )}
+              </div>
+              {claimed && (
+                <div className="item-meta">
+                  <span className="pill pill-green">จ่ายโดย {it.payerName}</span>
+                  <span>
+                    {it.splitMode === "all"
+                      ? "หารทั้งห้อง"
+                      : `หาร ${it.groupNames.join(", ")}`}
+                  </span>
+                </div>
               )}
             </div>
-            {claimed && (
-              <div className="item-meta">
-                <span className="pill pill-green">จ่ายโดย {it.payerName}</span>
-                <span>
-                  {it.splitMode === "all"
-                    ? "หารทั้งห้อง"
-                    : `หาร ${it.groupNames.join(", ")}`}
-                </span>
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {isHost && (
-        <button
-          className="btn btn-danger mt-lg"
-          onClick={() => setShowFinish(true)}
-        >
-          จบห้อง (ลบข้อมูลทั้งหมด)
-        </button>
-      )}
+          );
+        })}
+      </div>
 
       {/* actions — ซ่อนตอนมี sheet/dialog เปิด กันปุ่มลอยทับแป้นพิมพ์ */}
       {!overlayOpen && (
-        <>
+        <div className="sticky-bar">
           <button
-            className="fab"
-            onClick={() => setSheet("addItem")}
-            aria-label="เพิ่มรายการ"
+            className="btn btn-primary"
+            onClick={() => navigate(`/room/${idRoom}/settlement`)}
           >
-            +
+            ดูสรุปหารเงิน
           </button>
-          <div className="sticky-bar">
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate(`/room/${idRoom}/settlement`)}
-            >
-              ดูสรุปหารเงิน
-            </button>
-          </div>
-        </>
+        </div>
       )}
 
       {/* sheets / dialogs */}
