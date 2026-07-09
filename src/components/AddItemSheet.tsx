@@ -6,13 +6,13 @@ import { LIMITS, sanitizeText } from "../lib/sanitize";
 import type { Member, GroupFull } from "../lib/types";
 
 export default function AddItemSheet({
-  code,
+  roomId,
   members,
   groups,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   members: Member[];
   groups: GroupFull[];
   onClose: () => void;
@@ -57,13 +57,13 @@ export default function AddItemSheet({
     setError("");
     try {
       // 1) สร้าง item ก่อนเสมอ → ได้ id กลับมา
-      const item = await api.addItem(code, {
+      const item = await api.addItem(roomId, {
         name: name.trim(),
         note: note.trim() || undefined,
       });
       // 2) ถ้ากรอกครบ → claim ต่อทันทีด้วย endpoint เดิม
       if (hasAll) {
-        await api.claimItem(code, item.id, {
+        await api.claimItem(roomId, item.id, {
           price: Number(price),
           claimedBy,
           splitMode,

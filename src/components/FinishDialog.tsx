@@ -4,13 +4,13 @@ import { money, buildSettlementText } from "../lib/format";
 import type { Settlement } from "../lib/types";
 
 export default function FinishDialog({
-  code,
+  roomId,
   userId,
   roomName,
   onClose,
   onHome,
 }: {
-  code: string;
+  roomId: string;
   userId: string;
   roomName: string;
   onClose: () => void; // ยกเลิก
@@ -22,15 +22,15 @@ export default function FinishDialog({
 
   // ดึงสรุปมาโชว์ก่อนลบ (ให้ก็อปเก็บได้)
   useEffect(() => {
-    api.settlement(code).then(setSettlement).catch(() => {});
-  }, [code]);
+    api.settlement(roomId).then(setSettlement).catch(() => {});
+  }, [roomId]);
 
   const text = settlement ? buildSettlementText(roomName, settlement) : "";
 
   async function confirmFinish() {
     setLoading(true);
     try {
-      await api.finish(code, userId); // ลบข้อมูลทั้งห้อง
+      await api.finish(roomId, userId); // ลบข้อมูลทั้งห้อง
       setDone(true); // ห้องหายแล้ว → โชว์สรุปที่ดึงไว้ (frozen)
     } catch {
       alert("จบห้องไม่สำเร็จ (คุณเป็น host ไหม?)");

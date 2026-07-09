@@ -4,11 +4,11 @@ import { api } from "../lib/api";
 import { LIMITS, sanitizeText, sanitizePhone, isValidPhone } from "../lib/sanitize";
 
 export default function AddMemberSheet({
-  code,
+  roomId,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   onClose: () => void;
   onDone: () => void; // เรียกหลังสำเร็จ (ให้ parent refetch)
 }) {
@@ -22,7 +22,7 @@ export default function AddMemberSheet({
     setLoading(true);
     try {
       // ส่ง phone เฉพาะตอนใส่จริง (ว่าง = ไม่มีเบอร์)
-      await api.addUser(code, name.trim(), phone || undefined);
+      await api.addUser(roomId, name.trim(), phone || undefined);
       onDone();
       onClose();
     } finally {

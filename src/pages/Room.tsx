@@ -16,9 +16,8 @@ import LoadingScreen from "../components/LoadingScreen";
 type Sheet = "addMember" | "addItem" | "createGroup" | null;
 
 export default function Room() {
-  const { idRoom = "" } = useParams();
+  const { idRoom = "" } = useParams(); // idRoom = roomId (UUID) — ใช้ยิงตรงทุก endpoint
   const navigate = useNavigate();
-  const [code, setCode] = useState(""); // resolve จาก idRoom (UUID) ก่อน แล้วค่อยใช้กับ endpoint by-code
   const [data, setData] = useState<RoomFull | null>(null);
   const [error, setError] = useState("");
   const [sheet, setSheet] = useState<Sheet>(null);
@@ -36,38 +35,31 @@ export default function Room() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  // ขั้นแรก: แปลง idRoom (UUID จาก URL) → code จริง ยิงครั้งเดียวตอนเข้าห้อง
-  useEffect(() => {
-    api
-      .getRoomById(idRoom)
-      .then((room) => setCode(room.code))
-      .catch(() => setError("ห้องนี้ถูกจบไปแล้ว หรือไม่มีอยู่"));
-  }, [idRoom]);
-
   // silent = true สำหรับ background refetch → ไม่เด้งหน้า error ถ้าพลาดแวบเดียว (เน็ต/429)
+  // ยิง /full ด้วย idRoom (roomId) ตรง ๆ — ถ้าห้องไม่มี/ถูกจบ /full จะ 404 เอง
   const load = useCallback(
     async (opts?: { silent?: boolean }) => {
-      if (!code) return; // ยังไม่ได้ resolve code
+      if (!idRoom) return;
       try {
-        setData(await api.getRoomFull(code));
+        setData(await api.getRoomFull(idRoom));
       } catch {
         if (!opts?.silent) setError("ห้องนี้ถูกจบไปแล้ว หรือไม่มีอยู่");
       }
     },
-    [code],
+    [idRoom],
   );
 
-  // พอได้ code แล้ว: โหลดข้อมูล + เปิดสาย SSE (realtime)
+  // โหลดข้อมูล + เปิดสาย SSE (realtime)
   useEffect(() => {
-    if (!code) return;
+    if (!idRoom) return;
     load();
     const es = new EventSource(
-      `${import.meta.env.VITE_API_URL}/rooms/${code}/events`,
+      `${import.meta.env.VITE_API_URL}/rooms/${idRoom}/events`,
     );
     es.onmessage = () => load({ silent: true }); // มีสัญญาณ → refetch
     // EventSource รีคอนเน็คเองอัตโนมัติถ้าสายหลุด (ข้อดีใหญ่)
     return () => es.close();
-  }, [code, load]);
+  }, [idRoom, load]);
 
   function goHome() {
     storage.clear();
@@ -248,6 +240,7 @@ export default function Room() {
                   <button className="mini-btn">claim</button>
                 )}
               </div>
+              {it.note && <div className="item-note">{it.note}</div>}
               {claimed && (
                 <div className="item-meta">
                   <span className="pill pill-green">จ่ายโดย {it.payerName}</span>
@@ -278,14 +271,14 @@ export default function Room() {
       {/* sheets / dialogs */}
       {sheet === "addMember" && (
         <AddMemberSheet
-          code={code}
+          roomId={idRoom}
           onClose={() => setSheet(null)}
           onDone={load}
         />
       )}
       {editMember && (
         <EditMemberSheet
-          code={code}
+          roomId={idRoom}
           member={editMember}
           onClose={() => setEditMember(null)}
           onDone={load}
@@ -293,7 +286,7 @@ export default function Room() {
       )}
       {sheet === "addItem" && (
         <AddItemSheet
-          code={code}
+          roomId={idRoom}
           members={members}
           groups={groups}
           onClose={() => setSheet(null)}
@@ -302,7 +295,7 @@ export default function Room() {
       )}
       {sheet === "createGroup" && (
         <CreateGroupSheet
-          code={code}
+          roomId={idRoom}
           members={members}
           onClose={() => setSheet(null)}
           onDone={load}
@@ -310,7 +303,7 @@ export default function Room() {
       )}
       {claimItem && (
         <ClaimSheet
-          code={code}
+          roomId={idRoom}
           item={claimItem}
           members={members}
           groups={groups}
@@ -325,7 +318,7 @@ export default function Room() {
           if (!g) return null;
           return (
             <ManageGroupSheet
-              code={code}
+              roomId={idRoom}
               group={g}
               members={members}
               onClose={() => setManageGroupId(null)}
@@ -335,7 +328,7 @@ export default function Room() {
         })()}
       {showFinish && session && (
         <FinishDialog
-          code={code}
+          roomId={idRoom}
           userId={session.userId}
           roomName={room.name}
           onClose={() => setShowFinish(false)}

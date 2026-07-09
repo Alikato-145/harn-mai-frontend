@@ -5,12 +5,12 @@ import type { Member } from "../lib/types";
 import { LIMITS, sanitizeText, sanitizePhone, isValidPhone } from "../lib/sanitize";
 
 export default function EditMemberSheet({
-  code,
+  roomId,
   member,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   member: Member;
   onClose: () => void;
   onDone: () => void; // เรียกหลังสำเร็จ (ให้ parent refetch)
@@ -25,7 +25,7 @@ export default function EditMemberSheet({
     setLoading(true);
     try {
       // ส่ง phone เฉพาะตอนมีค่า (เว้นว่าง = คงเบอร์เดิม, ยังลบเบอร์ผ่านหน้านี้ไม่ได้)
-      await api.updateUser(code, member.id, {
+      await api.updateUser(roomId, member.id, {
         name: name.trim(),
         ...(phone ? { phone } : {}),
       });

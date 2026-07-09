@@ -9,23 +9,18 @@ import LoadingScreen from "../components/LoadingScreen";
 export default function Settlement() {
   const { idRoom = "" } = useParams();
   const navigate = useNavigate();
-  const [code, setCode] = useState(""); // resolve จาก idRoom ก่อน
   const [data, setData] = useState<SettlementType | null>(null);
   const [roomName, setRoomName] = useState("");
   const [copied, setCopied] = useState(false);
   const [openTx, setOpenTx] = useState<number | null>(null); // transaction ที่กาง QR อยู่
 
-  // idRoom (UUID) → code
+  // ใช้ idRoom (roomId) ยิงตรง — ไม่ต้อง resolve code ก่อนแล้ว
   useEffect(() => {
-    api.getRoomById(idRoom).then((r) => setCode(r.code)).catch(() => {});
-  }, [idRoom]);
-
-  useEffect(() => {
-    if (!code) return;
-    api.settlement(code).then(setData).catch(() => {});
+    if (!idRoom) return;
+    api.settlement(idRoom).then(setData).catch(() => {});
     // เอาชื่อห้องไว้ทำ export text
-    api.getRoomFull(code).then((f) => setRoomName(f.room.name)).catch(() => {});
-  }, [code]);
+    api.getRoomFull(idRoom).then((f) => setRoomName(f.room.name)).catch(() => {});
+  }, [idRoom]);
 
   if (!data) return <LoadingScreen message="กำลังคำนวณ…" />;
 

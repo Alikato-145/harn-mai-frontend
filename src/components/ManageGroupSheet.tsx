@@ -4,13 +4,13 @@ import { api } from "../lib/api";
 import type { GroupFull, Member } from "../lib/types";
 
 export default function ManageGroupSheet({
-  code,
+  roomId,
   group,
   members,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   group: GroupFull;
   members: Member[]; // สมาชิกทั้งห้อง
   onClose: () => void;
@@ -32,7 +32,7 @@ export default function ManageGroupSheet({
   async function addMembers() {
     setLoading(true);
     try {
-      await api.addGroupMembers(code, group.id, addIds);
+      await api.addGroupMembers(roomId, group.id, addIds);
       setAddIds([]);
       onDone(); // group.members จะอัปเดตผ่าน prop
     } finally {
@@ -41,13 +41,13 @@ export default function ManageGroupSheet({
   }
 
   async function removeMember(userId: string) {
-    await api.removeGroupMember(code, group.id, userId);
+    await api.removeGroupMember(roomId, group.id, userId);
     onDone();
   }
 
   async function deleteGroup() {
     if (!confirm(`ลบกลุ่ม "${group.name}"?`)) return;
-    await api.deleteGroup(code, group.id);
+    await api.deleteGroup(roomId, group.id);
     onDone();
     onClose();
   }

@@ -5,14 +5,14 @@ import { api } from "../lib/api";
 import type { ItemFull, Member, GroupFull } from "../lib/types";
 
 export default function ClaimSheet({
-  code,
+  roomId,
   item,
   members,
   groups,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   item: ItemFull;
   members: Member[];
   groups: GroupFull[];
@@ -38,7 +38,7 @@ export default function ClaimSheet({
   async function submit() {
     setLoading(true);
     try {
-      await api.claimItem(code, item.id, {
+      await api.claimItem(roomId, item.id, {
         price: Number(price),
         claimedBy,
         splitMode,
@@ -59,7 +59,7 @@ export default function ClaimSheet({
     }
     setLoading(true);
     try {
-      await api.deleteItem(code, item.id);
+      await api.deleteItem(roomId, item.id);
       onDone();
       onClose();
     } finally {
@@ -70,7 +70,7 @@ export default function ClaimSheet({
   async function unclaim() {
     setLoading(true);
     try {
-      await api.unclaimItem(code, item.id);
+      await api.unclaimItem(roomId, item.id);
       onDone();
       onClose();
     } finally {

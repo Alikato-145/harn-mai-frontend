@@ -5,12 +5,12 @@ import { LIMITS, sanitizeText } from "../lib/sanitize";
 import type { Member } from "../lib/types";
 
 export default function CreateGroupSheet({
-  code,
+  roomId,
   members,
   onClose,
   onDone,
 }: {
-  code: string;
+  roomId: string;
   members: Member[];
   onClose: () => void;
   onDone: () => void;
@@ -28,7 +28,7 @@ export default function CreateGroupSheet({
   async function submit() {
     setLoading(true);
     try {
-      await api.createGroup(code, { name: name.trim(), userIds });
+      await api.createGroup(roomId, { name: name.trim(), userIds });
       onDone();
       onClose();
     } finally {
