@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
+import PaySplitFields from "./PaySplitFields";
 import { api } from "../lib/api";
-import { LIMITS, sanitizePrice } from "../lib/sanitize";
 import type { ItemFull, Member, GroupFull } from "../lib/types";
 
 export default function ClaimSheet({
@@ -85,66 +85,19 @@ export default function ClaimSheet({
 
   return (
     <BottomSheet title={`จ่าย / หาร: ${item.name}`} onClose={onClose}>
-      <label className="label">ราคา (บาท) *</label>
-      <input
-        className="field"
-        type="text"
-        inputMode="decimal"
-        placeholder="0"
-        value={price}
-        maxLength={LIMITS.price}
-        onChange={(e) => setPrice(sanitizePrice(e.target.value))}
+      <PaySplitFields
+        required
+        price={price}
+        onPrice={setPrice}
+        claimedBy={claimedBy}
+        onClaimedBy={setClaimedBy}
+        splitMode={splitMode}
+        onSplitMode={setSplitMode}
+        groupIds={groupIds}
+        onToggleGroup={toggleGroup}
+        members={members}
+        groups={groups}
       />
-
-      <label className="label">ใครจ่าย</label>
-      <div className="payer-picker">
-        {members.map((m) => (
-          <span
-            key={m.id}
-            className={`payer-chip ${claimedBy === m.id ? "active" : ""}`}
-            onClick={() => setClaimedBy(m.id)}
-          >
-            {m.name}
-          </span>
-        ))}
-      </div>
-
-      <label className="label mt">วิธีหาร</label>
-      <div className="toggle">
-        <div
-          className={`opt ${splitMode === "all" ? "active" : ""}`}
-          onClick={() => setSplitMode("all")}
-        >
-          หารทั้งห้อง
-        </div>
-        <div
-          className={`opt ${splitMode === "group" ? "active" : ""} ${
-            groups.length === 0 ? "disabled" : ""
-          }`}
-          onClick={() => groups.length > 0 && setSplitMode("group")}
-        >
-          เฉพาะกลุ่ม
-        </div>
-      </div>
-
-      {/* โชว์รายการกลุ่มเฉพาะตอนเลือก "เฉพาะกลุ่ม" */}
-      {splitMode === "group" && (
-        <div className="check-list">
-          {groups.length === 0 && (
-            <p className="muted small">ยังไม่มีกลุ่ม — สร้างกลุ่มก่อน</p>
-          )}
-          {groups.map((g) => (
-            <div
-              key={g.id}
-              className={`chk ${groupIds.includes(g.id) ? "on" : ""}`}
-              onClick={() => toggleGroup(g.id)}
-            >
-              <span className="box" />
-              {g.name} <span className="muted">({g.members.length})</span>
-            </div>
-          ))}
-        </div>
-      )}
 
       <button
         className="btn btn-primary mt"

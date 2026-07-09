@@ -294,6 +294,8 @@ export default function Room() {
       {sheet === "addItem" && (
         <AddItemSheet
           code={code}
+          members={members}
+          groups={groups}
           onClose={() => setSheet(null)}
           onDone={load}
         />
