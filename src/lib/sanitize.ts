@@ -1,5 +1,5 @@
 // จำกัดความยาว + กันอักขระแปลกๆ ใน text input ทุก field
-// อนุญาต: ไทย (U+0E00–U+0E7F), อังกฤษ, ตัวเลข, เว้นวรรค และเครื่องหมายพื้นฐาน . , - _ ( ) /
+// อนุญาต: ไทย (U+0E00–U+0E7F), อังกฤษ, ตัวเลข, เว้นวรรค และเครื่องหมายพื้นฐาน . , - _ ( ) / + &
 export const LIMITS = {
   roomName: 50,
   memberName: 30,
@@ -10,7 +10,7 @@ export const LIMITS = {
   phone: 10,
 } as const;
 
-const DISALLOWED = /[^a-zA-Z0-9฀-๿ .,\-_()/]/g;
+const DISALLOWED = /[^a-zA-Z0-9฀-๿ .,\-_()/+&]/g;
 
 export function sanitizeText(value: string, maxLength: number): string {
   return value.replace(DISALLOWED, "").slice(0, maxLength);
