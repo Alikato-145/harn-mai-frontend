@@ -100,4 +100,10 @@ export const api = {
   // settlement
   settlement: (roomId: string) =>
     request<Settlement>(`/rooms/${roomId}/settlement`),
+  // สร้าง QR พร้อมเพย์ใหม่ตามยอดที่ระบุ (ใช้ตอน toggle ปัดเศษ → ขอ payload ยอดที่ปัดแล้ว)
+  qrcode: (roomId: string, phoneNumber: string, amount: number) =>
+    request<{ payload: string }>(`/rooms/${roomId}/settlement/qrcode`, {
+      method: "POST",
+      body: JSON.stringify({ phoneNumber, amount }),
+    }),
 };

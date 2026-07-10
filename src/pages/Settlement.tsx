@@ -13,6 +13,9 @@ export default function Settlement() {
   const [roomName, setRoomName] = useState("");
   const [copied, setCopied] = useState(false);
   const [openTx, setOpenTx] = useState<number | null>(null); // transaction ที่กาง QR อยู่
+  const [roundUp, setRoundUp] = useState(false); // toggle ปัดเศษขึ้นเป็นบาทเต็ม
+  // index ของ transaction -> payload QR ที่ gen ใหม่ตามยอดที่ปัดขึ้น
+  const [roundedPayloads, setRoundedPayloads] = useState<Record<number, string>>({});
 
   // ใช้ idRoom (roomId) ยิงตรง — ไม่ต้อง resolve code ก่อนแล้ว
   useEffect(() => {
@@ -22,9 +25,33 @@ export default function Settlement() {
     api.getRoomFull(idRoom).then((f) => setRoomName(f.room.name)).catch(() => {});
   }, [idRoom]);
 
+  // ตอนเปิด toggle ปัดเศษ: ขอ payload QR ใหม่ (ยอดปัดขึ้น) เฉพาะรายการที่มีทศนิยม + มีเบอร์
+  useEffect(() => {
+    if (!roundUp || !data) return;
+    const need = data.transactions
+      .map((t, i) => ({ t, i }))
+      .filter(({ t }) => t.toPhone && !Number.isInteger(t.amount));
+    if (need.length === 0) return;
+    let cancelled = false;
+    Promise.all(
+      need.map(({ t, i }) =>
+        api
+          .qrcode(idRoom, t.toPhone!, Math.ceil(t.amount))
+          .then((r) => [i, r.payload] as const),
+      ),
+    )
+      .then((entries) => {
+        if (!cancelled) setRoundedPayloads(Object.fromEntries(entries));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [roundUp, data, idRoom]);
+
   if (!data) return <LoadingScreen message="กำลังคำนวณ…" />;
 
-  const text = buildSettlementText(roomName, data);
+  const text = buildSettlementText(roomName, data, roundUp);
 
   function copy() {
     navigator.clipboard.writeText(text);
@@ -75,6 +102,22 @@ export default function Settlement() {
 
       {/* ต้องโอน */}
       <div className="sec-title">ต้องโอน</div>
+      {data.transactions.length > 0 && (
+        <div className="toggle">
+          <div
+            className={`opt ${!roundUp ? "active" : ""}`}
+            onClick={() => setRoundUp(false)}
+          >
+            ทศนิยม
+          </div>
+          <div
+            className={`opt ${roundUp ? "active" : ""}`}
+            onClick={() => setRoundUp(true)}
+          >
+            ปัดขึ้นบาทเต็ม
+          </div>
+        </div>
+      )}
       {data.transactions.length === 0 && (
         <p className="muted small">ไม่มีรายการต้องโอน</p>
       )}
@@ -89,7 +132,7 @@ export default function Settlement() {
               <span>{t.fromName}</span>
               <span className="arrow">→</span>
               <span>{t.toName}</span>
-              <span className="tx-amt">{money(t.amount)}</span>
+              <span className="tx-amt">{money(t.amount, roundUp)}</span>
               <svg
                 className={`chev ${open ? "open" : ""}`}
                 viewBox="0 0 24 24"
@@ -105,18 +148,32 @@ export default function Settlement() {
             </div>
             {open && (
               <div className="tx-panel">
-                {t.promptPayPayload ? (
-                  <>
-                    <QRCodeSVG value={t.promptPayPayload} size={180} />
-                    <p className="muted small">
-                      สแกนพร้อมเพย์เพื่อโอนให้ {t.toName} · {money(t.amount)}
-                    </p>
-                  </>
-                ) : (
-                  <p className="muted small">
-                    {t.toName} ยังไม่มีเบอร์ PromptPay — ให้เจ้าตัวแตะโปรไฟล์ในห้องเพื่อเพิ่มเบอร์
-                  </p>
-                )}
+                {(() => {
+                  // ยอดมีทศนิยม + ปัดขึ้น → ใช้ QR ที่ gen ใหม่ตามยอดปัด, ไม่งั้นใช้ของเดิม
+                  const needRounded = roundUp && !Number.isInteger(t.amount);
+                  const qrVal = needRounded
+                    ? roundedPayloads[i]
+                    : t.promptPayPayload;
+                  if (!t.promptPayPayload) {
+                    return (
+                      <p className="muted small">
+                        {t.toName} ยังไม่มีเบอร์ PromptPay — ให้เจ้าตัวแตะโปรไฟล์ในห้องเพื่อเพิ่มเบอร์
+                      </p>
+                    );
+                  }
+                  if (!qrVal) {
+                    return <p className="muted small">กำลังสร้าง QR…</p>;
+                  }
+                  return (
+                    <>
+                      <QRCodeSVG value={qrVal} size={180} />
+                      <p className="muted small">
+                        สแกนพร้อมเพย์เพื่อโอนให้ {t.toName} ·{" "}
+                        {money(t.amount, roundUp)}
+                      </p>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
