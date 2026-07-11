@@ -36,7 +36,7 @@ export default function BottomSheet({
     <div className="sheet-overlay" onClick={onClose}>
       <div
         className="sheet"
-        style={{ marginBottom: kbInset }}
+        style={{ marginBottom: kbInset, maxHeight: `calc(90vh - ${kbInset}px)` }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="grab" />
