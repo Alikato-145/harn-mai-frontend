@@ -8,11 +8,13 @@ import { LIMITS, sanitizeText, sanitizePhone, isValidPhone } from "../lib/saniti
 export default function EditMemberSheet({
   roomId,
   member,
+  isHost,
   onClose,
   onDone,
 }: {
   roomId: string;
   member: Member;
+  isHost: boolean; // host ลบออกจากห้องไม่ได้ (backend ก็กันไว้)
   onClose: () => void;
   onDone: () => void; // เรียกหลังสำเร็จ (ให้ parent refetch)
 }) {
@@ -21,11 +23,13 @@ export default function EditMemberSheet({
   // เบอร์ที่บันทึกไว้แล้ว = เคยยินยอมมาก่อน → ติ๊กให้เลย, เบอร์ใหม่ต้องยินยอมก่อน
   const [consent, setConsent] = useState(!!member.phone);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const phoneOk = isValidPhone(phone);
   const consentOk = !phone || consent;
 
   async function submit() {
+    setError("");
     setLoading(true);
     try {
       // ส่ง phone เฉพาะตอนมีค่า (เว้นว่าง = คงเบอร์เดิม, ยังลบเบอร์ผ่านหน้านี้ไม่ได้)
@@ -35,13 +39,35 @@ export default function EditMemberSheet({
       });
       onDone();
       onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "บันทึกไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
   }
 
+  async function deleteMember() {
+    if (
+      !confirm(
+        `ลบ "${member.name}" ออกจากห้อง?\n\nคนนี้จะหายจากทุกกลุ่ม และรายการที่เคยจ่ายไว้จะกลับเป็น "ยังไม่ claim"`,
+      )
+    )
+      return;
+    setError("");
+    setLoading(true);
+    try {
+      await api.deleteUser(roomId, member.id);
+      onDone();
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "ลบไม่สำเร็จ");
+      setLoading(false); // คงชีทไว้ให้เห็น error (สำเร็จ = ปิดชีทไปแล้ว)
+    }
+  }
+
   return (
     <BottomSheet title="แก้ไขโปรไฟล์" onClose={onClose}>
+      {error && <div className="banner-error">{error}</div>}
       <input
         className="field"
         placeholder="ชื่อสมาชิก"
@@ -86,6 +112,17 @@ export default function EditMemberSheet({
       >
         บันทึก
       </button>
+      {isHost ? (
+        <p className="muted small mt">host ลบออกจากห้องไม่ได้</p>
+      ) : (
+        <button
+          className="btn btn-danger mt-lg"
+          disabled={loading}
+          onClick={deleteMember}
+        >
+          ลบคนนี้ออกจากห้อง
+        </button>
+      )}
     </BottomSheet>
   );
 }
