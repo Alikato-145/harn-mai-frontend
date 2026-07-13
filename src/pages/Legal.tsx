@@ -39,7 +39,7 @@ function Privacy() {
 
       <h2 className="legal-h2">1. ผู้ควบคุมข้อมูลส่วนบุคคล</h2>
       <p>
-        ติดต่อ:{" "}
+        มนัส — ติดต่อ:{" "}
         <a className="link" href="mailto:manbome@gmail.com">
           manbome@gmail.com
         </a>{" "}
@@ -86,7 +86,7 @@ function Privacy() {
 
       <h2 className="legal-h2">5. ผู้ให้บริการภายนอก</h2>
       <p>
-        เราใช้บริการ Turso / libSQL (ฐานข้อมูล) และผู้ให้บริการโฮสต์เว็บ/API
+        เราใช้บริการ Turso / libSQL (ฐานข้อมูล) และ Vercel (โฮสต์เว็บ/API)
         ในการรันระบบ ซึ่งอาจเก็บข้อมูลบนเซิร์ฟเวอร์ต่างประเทศ
         (มีการส่งข้อมูลข้ามพรมแดน)
       </p>
