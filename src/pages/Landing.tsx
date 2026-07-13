@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { storage } from "../lib/storage";
 import { LIMITS, sanitizeText, sanitizeCode } from "../lib/sanitize";
@@ -121,6 +121,17 @@ export default function Landing() {
           </button>
         </>
       )}
+
+      <p className="legal-consent">
+        การสร้างหรือเข้าห้อง ถือว่าคุณยอมรับ{" "}
+        <Link className="link" to="/terms">
+          เงื่อนไขการใช้งาน
+        </Link>{" "}
+        และ{" "}
+        <Link className="link" to="/privacy">
+          นโยบายความเป็นส่วนตัว
+        </Link>
+      </p>
     </div>
   );
 }
