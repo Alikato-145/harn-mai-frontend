@@ -18,6 +18,7 @@ export default function ManageGroupSheet({
 }) {
   const [addIds, setAddIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // คนในห้องที่ "ยังไม่อยู่" ในกลุ่มนี้ → เอามาให้เลือกเพิ่ม
   const inGroup = new Set(group.members.map((m) => m.userId));
@@ -30,30 +31,44 @@ export default function ManageGroupSheet({
   }
 
   async function addMembers() {
+    setError("");
     setLoading(true);
     try {
       await api.addGroupMembers(roomId, group.id, addIds);
       setAddIds([]);
       onDone(); // group.members จะอัปเดตผ่าน prop
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "เพิ่มสมาชิกไม่สำเร็จ");
     } finally {
       setLoading(false);
     }
   }
 
   async function removeMember(userId: string) {
-    await api.removeGroupMember(roomId, group.id, userId);
-    onDone();
+    setError("");
+    try {
+      await api.removeGroupMember(roomId, group.id, userId);
+      onDone();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "ลบสมาชิกไม่สำเร็จ");
+    }
   }
 
   async function deleteGroup() {
     if (!confirm(`ลบกลุ่ม "${group.name}"?`)) return;
-    await api.deleteGroup(roomId, group.id);
-    onDone();
-    onClose();
+    setError("");
+    try {
+      await api.deleteGroup(roomId, group.id);
+      onDone();
+      onClose();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "ลบกลุ่มไม่สำเร็จ");
+    }
   }
 
   return (
     <BottomSheet title={`จัดการกลุ่ม: ${group.name}`} onClose={onClose}>
+      {error && <div className="banner-error">{error}</div>}
       {/* สมาชิกปัจจุบัน — กด ✕ เพื่อเอาออก */}
       <label className="label">สมาชิกในกลุ่ม ({group.members.length})</label>
       {group.members.length === 0 && (
