@@ -384,7 +384,7 @@ body {
 /* consent checkbox ตรงช่องกรอกเบอร์ (reuse สไตล์ .chk) */
 .consent-chk {
   display: flex; align-items: flex-start; gap: 10px; padding: 11px 12px;
-  border: 1.5px solid var(--line); border-radius: 12px; margin-top: 4px;
+  border: 1.5px solid var(--line); border-radius: 12px; margin: 4px 0 14px;
   font-size: 13px; line-height: 1.5; cursor: pointer;
 }
 .consent-chk input { display: none; }
