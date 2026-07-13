@@ -53,6 +53,8 @@ export const api = {
       `/rooms/${roomId}/users/${userId}`,
       { method: "PATCH", body: JSON.stringify(body) },
     ),
+  deleteUser: (roomId: string, userId: string) =>
+    request(`/rooms/${roomId}/users/${userId}`, { method: "DELETE" }),
 
   // items
   addItem: (roomId: string, body: { name: string; note?: string }) =>

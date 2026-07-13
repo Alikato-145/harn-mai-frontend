@@ -280,6 +280,7 @@ export default function Room() {
         <EditMemberSheet
           roomId={idRoom}
           member={editMember}
+          isHost={editMember.id === data?.room.hostUserId}
           onClose={() => setEditMember(null)}
           onDone={load}
         />
