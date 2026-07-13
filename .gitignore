@@ -26,3 +26,6 @@ dist-ssr
 
 # Superpowers brainstorming scratch files
 .superpowers/
+
+# Claude Code local worktrees (never commit)
+.claude/worktrees/

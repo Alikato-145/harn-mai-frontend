@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Room from "./pages/Room";
 import Settlement from "./pages/Settlement";
+import Legal from "./pages/Legal";
 import CreditBadge from "./components/CreditBadge";
 
 export default function App() {
@@ -11,6 +12,8 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/room/:idRoom" element={<Room />} />
         <Route path="/room/:idRoom/settlement" element={<Settlement />} />
+        <Route path="/privacy" element={<Legal doc="privacy" />} />
+        <Route path="/terms" element={<Legal doc="terms" />} />
       </Routes>
       {/* footer เดียว โชว์ทุกหน้า (fixed ล่างจอ) */}
       <footer className="app-footer">

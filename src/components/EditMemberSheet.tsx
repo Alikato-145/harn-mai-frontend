@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import BottomSheet from "./BottomSheet";
 import { api } from "../lib/api";
 import type { Member } from "../lib/types";
@@ -17,9 +18,12 @@ export default function EditMemberSheet({
 }) {
   const [name, setName] = useState(member.name);
   const [phone, setPhone] = useState(member.phone ?? "");
+  // เบอร์ที่บันทึกไว้แล้ว = เคยยินยอมมาก่อน → ติ๊กให้เลย, เบอร์ใหม่ต้องยินยอมก่อน
+  const [consent, setConsent] = useState(!!member.phone);
   const [loading, setLoading] = useState(false);
 
   const phoneOk = isValidPhone(phone);
+  const consentOk = !phone || consent;
 
   async function submit() {
     setLoading(true);
@@ -57,9 +61,27 @@ export default function EditMemberSheet({
       {!phoneOk && (
         <p className="muted small">เบอร์ต้องขึ้นต้นด้วย 0 และมี 10 หลัก</p>
       )}
+      {phone && (
+        <label className={`consent-chk ${consent ? "on" : ""}`}>
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+          />
+          <span className="box" />
+          <span>
+            ยินยอมให้เก็บเบอร์นี้เพื่อสร้าง QR PromptPay
+            โดยคนในห้องจะเห็นเบอร์/QR ของฉัน (
+            <Link className="link" to="/privacy" target="_blank">
+              นโยบายความเป็นส่วนตัว
+            </Link>
+            )
+          </span>
+        </label>
+      )}
       <button
         className="btn btn-primary"
-        disabled={!name.trim() || !phoneOk || loading}
+        disabled={!name.trim() || !phoneOk || !consentOk || loading}
         onClick={submit}
       >
         บันทึก

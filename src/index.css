@@ -366,3 +366,34 @@ body {
   font-size: 12px; line-height: 1.6; padding: 14px; border-radius: 12px;
   white-space: pre-wrap; text-align: left;
 }
+
+/* หน้าเอกสารกฎหมาย (privacy / terms) */
+.legal { text-align: left; }
+.legal-back { background: none; border: none; padding: 4px 0; margin-bottom: 8px; }
+.legal-h1 { font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+.legal-updated { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+.legal-h2 { font-size: 15px; font-weight: 700; color: var(--ink); margin: 20px 0 6px; }
+.legal p { font-size: 14px; line-height: 1.65; color: #3a372f; }
+.legal-ul { margin: 6px 0 6px 18px; }
+.legal-ul li { font-size: 14px; line-height: 1.6; color: #3a372f; margin-bottom: 4px; }
+.legal-switch { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+
+/* บรรทัดยอมรับเงื่อนไข ใต้ปุ่มหน้า Landing */
+.legal-consent { margin-top: 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+/* consent checkbox ตรงช่องกรอกเบอร์ (reuse สไตล์ .chk) */
+.consent-chk {
+  display: flex; align-items: flex-start; gap: 10px; padding: 11px 12px;
+  border: 1.5px solid var(--line); border-radius: 12px; margin-top: 4px;
+  font-size: 13px; line-height: 1.5; cursor: pointer;
+}
+.consent-chk input { display: none; }
+.consent-chk .box {
+  width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid #cbd5e1;
+  flex-shrink: 0; margin-top: 1px;
+}
+.consent-chk.on { border-color: var(--primary); background: #f0fdf4; }
+.consent-chk.on .box { background: var(--primary); border-color: var(--primary); position: relative; }
+.consent-chk.on .box::after {
+  content: "✓"; color: #fff; font-size: 13px; position: absolute; top: -1px; left: 3px;
+}
