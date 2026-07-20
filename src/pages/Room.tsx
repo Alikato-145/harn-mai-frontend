@@ -79,7 +79,19 @@ export default function Room() {
   if (!data) return <LoadingScreen message="กำลังโหลดห้อง…" />;
 
   const { room, members, groups, items } = data;
+  // กลุ่มลับ (สร้างตอนเลือกคน) ไม่นับเป็นกลุ่มปกติ — ซ่อนจากลิสต์กลุ่มย่อย
+  const namedGroups = groups.filter((g) => !g.isCreatedByItem);
   const isHost = session?.userId === room.hostUserId;
+
+  // ป้ายวิธีหารของ item — โหมดเลือกคนไม่มีชื่อกลุ่ม เลยโชว์ชื่อคนแทน
+  function splitLabel(it: ItemFull) {
+    if (it.splitMode === "all") return "หารทั้งห้อง";
+    const anon = groups.find(
+      (g) => g.id === it.groupIds[0] && g.isCreatedByItem,
+    );
+    if (anon) return `หาร ${anon.members.map((m) => m.name).join(", ")}`;
+    return `หาร ${it.groupNames.join(", ")}`;
+  }
   const overlayOpen =
     sheet !== null ||
     claimItem !== null ||
@@ -180,15 +192,17 @@ export default function Room() {
       <div className="section-panel section-panel--groups">
         <div className="sec-title">
           <span>
-            กลุ่มย่อย <span className="count">{groups.length}</span>
+            กลุ่มย่อย <span className="count">{namedGroups.length}</span>
           </span>
           <span className="link" onClick={() => setSheet("createGroup")}>
             + สร้างกลุ่ม
           </span>
         </div>
-        {groups.length === 0 && <p className="muted small">ยังไม่มีกลุ่ม</p>}
+        {namedGroups.length === 0 && (
+          <p className="muted small">ยังไม่มีกลุ่ม</p>
+        )}
         <div className="group-list">
-          {groups.map((g) => (
+          {namedGroups.map((g) => (
             <div
               className="group-card"
               key={g.id}
@@ -244,11 +258,7 @@ export default function Room() {
               {claimed && (
                 <div className="item-meta">
                   <span className="pill pill-green">จ่ายโดย {it.payerName}</span>
-                  <span>
-                    {it.splitMode === "all"
-                      ? "หารทั้งห้อง"
-                      : `หาร ${it.groupNames.join(", ")}`}
-                  </span>
+                  <span>{splitLabel(it)}</span>
                 </div>
               )}
             </div>

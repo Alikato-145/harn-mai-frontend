@@ -3,7 +3,7 @@ import BottomSheet from "./BottomSheet";
 import PaySplitFields from "./PaySplitFields";
 import { api } from "../lib/api";
 import { LIMITS, sanitizeText } from "../lib/sanitize";
-import type { Member, GroupFull } from "../lib/types";
+import type { Member, GroupFull, SplitUiMode } from "../lib/types";
 
 export default function AddItemSheet({
   roomId,
@@ -23,14 +23,24 @@ export default function AddItemSheet({
   // ฟิลด์ไม่บังคับ (บล็อกล่าง) — all-or-nothing
   const [price, setPrice] = useState("");
   const [claimedBy, setClaimedBy] = useState("");
-  const [splitMode, setSplitMode] = useState<"all" | "group">("all");
+  const [mode, setMode] = useState<SplitUiMode>("all");
   const [groupIds, setGroupIds] = useState<string[]>([]);
+  const [userIds, setUserIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // กลุ่มปกติ (กรองกลุ่มลับออก) — ส่งให้ checklist "เฉพาะกลุ่ม"
+  const namedGroups = groups.filter((g) => !g.isCreatedByItem);
 
   function toggleGroup(id: string) {
     setGroupIds((prev) =>
       prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id],
+    );
+  }
+
+  function toggleUser(id: string) {
+    setUserIds((prev) =>
+      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id],
     );
   }
 
@@ -40,14 +50,17 @@ export default function AddItemSheet({
   const hasAll =
     Number(price) > 0 &&
     claimedBy !== "" &&
-    (splitMode === "all" || groupIds.length > 0);
+    (mode === "all" ||
+      (mode === "group" && groupIds.length > 0) ||
+      (mode === "people" && userIds.length > 0));
 
   // ถ้าแตะบล็อกล่างแล้วยังไม่ครบ → ขาดอะไรบ้าง (ไว้โชว์เตือน)
   const missing: string[] = [];
   if (hasAny) {
     if (!(Number(price) > 0)) missing.push("ราคา");
     if (claimedBy === "") missing.push("คนจ่าย");
-    if (splitMode === "group" && groupIds.length === 0) missing.push("เลือกกลุ่ม");
+    if (mode === "group" && groupIds.length === 0) missing.push("เลือกกลุ่ม");
+    if (mode === "people" && userIds.length === 0) missing.push("เลือกคน");
   }
 
   const canSubmit = name.trim() !== "" && !loading && (!hasAny || hasAll);
@@ -66,8 +79,9 @@ export default function AddItemSheet({
         await api.claimItem(roomId, item.id, {
           price: Number(price),
           claimedBy,
-          splitMode,
-          groupIds: splitMode === "group" ? groupIds : undefined,
+          splitMode: mode === "all" ? "all" : "group",
+          groupIds: mode === "group" ? groupIds : undefined,
+          userIds: mode === "people" ? userIds : undefined,
         });
       }
       onDone();
@@ -112,12 +126,14 @@ export default function AddItemSheet({
         onPrice={setPrice}
         claimedBy={claimedBy}
         onClaimedBy={setClaimedBy}
-        splitMode={splitMode}
-        onSplitMode={setSplitMode}
+        mode={mode}
+        onMode={setMode}
         groupIds={groupIds}
         onToggleGroup={toggleGroup}
+        userIds={userIds}
+        onToggleUser={toggleUser}
         members={members}
-        groups={groups}
+        groups={namedGroups}
       />
 
       {missing.length > 0 && (

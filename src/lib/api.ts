@@ -70,6 +70,7 @@ export const api = {
       claimedBy: string;
       splitMode: "all" | "group";
       groupIds?: string[];
+      userIds?: string[];
     },
   ) =>
     request(`/rooms/${roomId}/items/${itemId}/claim`, {

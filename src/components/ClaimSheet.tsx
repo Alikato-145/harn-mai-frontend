@@ -2,7 +2,7 @@ import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import PaySplitFields from "./PaySplitFields";
 import { api } from "../lib/api";
-import type { ItemFull, Member, GroupFull } from "../lib/types";
+import type { ItemFull, Member, GroupFull, SplitUiMode } from "../lib/types";
 
 export default function ClaimSheet({
   roomId,
@@ -19,19 +19,42 @@ export default function ClaimSheet({
   onClose: () => void;
   onDone: () => void;
 }) {
+  // item ที่เคย claim แบบ "เลือกคน" จะผูกกับกลุ่มลับ (isCreatedByItem) 1 กลุ่ม
+  // เจอ → prefill โหมด people + ติ๊กสมาชิกกลุ่มลับนั้นกลับมา
+  const anonGroup =
+    item.splitMode === "group"
+      ? groups.find((g) => g.id === item.groupIds[0] && g.isCreatedByItem)
+      : undefined;
+
   // prefill ถ้า item เคย claim แล้ว (กรณีแก้)
   const [price, setPrice] = useState(item.price != null ? String(item.price) : "");
   const [claimedBy, setClaimedBy] = useState(item.claimedBy ?? "");
-  const [splitMode, setSplitMode] = useState<"all" | "group">(item.splitMode);
-  const [groupIds, setGroupIds] = useState<string[]>(item.groupIds ?? []);
+  const [mode, setMode] = useState<SplitUiMode>(
+    anonGroup ? "people" : item.splitMode,
+  );
+  const [groupIds, setGroupIds] = useState<string[]>(
+    anonGroup ? [] : (item.groupIds ?? []),
+  );
+  const [userIds, setUserIds] = useState<string[]>(
+    anonGroup ? anonGroup.members.map((m) => m.userId) : [],
+  );
   const [loading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const alreadyClaimed = item.claimedBy != null;
 
+  // กลุ่มปกติ (กรองกลุ่มลับออก) — ส่งให้ checklist "เฉพาะกลุ่ม"
+  const namedGroups = groups.filter((g) => !g.isCreatedByItem);
+
   function toggleGroup(id: string) {
     setGroupIds((prev) =>
       prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id],
+    );
+  }
+
+  function toggleUser(id: string) {
+    setUserIds((prev) =>
+      prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id],
     );
   }
 
@@ -41,8 +64,9 @@ export default function ClaimSheet({
       await api.claimItem(roomId, item.id, {
         price: Number(price),
         claimedBy,
-        splitMode,
-        groupIds: splitMode === "group" ? groupIds : undefined,
+        splitMode: mode === "all" ? "all" : "group",
+        groupIds: mode === "group" ? groupIds : undefined,
+        userIds: mode === "people" ? userIds : undefined,
       });
       onDone();
       onClose();
@@ -81,7 +105,9 @@ export default function ClaimSheet({
   const canSubmit =
     Number(price) > 0 &&
     claimedBy !== "" &&
-    (splitMode === "all" || groupIds.length > 0);
+    (mode === "all" ||
+      (mode === "group" && groupIds.length > 0) ||
+      (mode === "people" && userIds.length > 0));
 
   return (
     <BottomSheet title={`จ่าย / หาร: ${item.name}`} onClose={onClose}>
@@ -91,12 +117,14 @@ export default function ClaimSheet({
         onPrice={setPrice}
         claimedBy={claimedBy}
         onClaimedBy={setClaimedBy}
-        splitMode={splitMode}
-        onSplitMode={setSplitMode}
+        mode={mode}
+        onMode={setMode}
         groupIds={groupIds}
         onToggleGroup={toggleGroup}
+        userIds={userIds}
+        onToggleUser={toggleUser}
         members={members}
-        groups={groups}
+        groups={namedGroups}
       />
 
       <button

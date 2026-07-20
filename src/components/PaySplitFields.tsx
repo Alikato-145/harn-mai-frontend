@@ -1,5 +1,5 @@
 import { LIMITS, sanitizePrice } from "../lib/sanitize";
-import type { Member, GroupFull } from "../lib/types";
+import type { Member, GroupFull, SplitUiMode } from "../lib/types";
 
 // ฟิลด์ ราคา / คนจ่าย / วิธีหาร ที่ใช้ร่วมกันทั้ง ClaimSheet และ AddItemSheet
 // controlled: state อยู่ที่ parent — component นี้แค่ render + ยิง event กลับ
@@ -8,10 +8,12 @@ export default function PaySplitFields({
   onPrice,
   claimedBy,
   onClaimedBy,
-  splitMode,
-  onSplitMode,
+  mode,
+  onMode,
   groupIds,
   onToggleGroup,
+  userIds,
+  onToggleUser,
   members,
   groups,
   required = false,
@@ -20,12 +22,14 @@ export default function PaySplitFields({
   onPrice: (v: string) => void;
   claimedBy: string;
   onClaimedBy: (v: string) => void;
-  splitMode: "all" | "group";
-  onSplitMode: (v: "all" | "group") => void;
+  mode: SplitUiMode;
+  onMode: (v: SplitUiMode) => void;
   groupIds: string[];
   onToggleGroup: (id: string) => void;
+  userIds: string[];
+  onToggleUser: (id: string) => void;
   members: Member[];
-  groups: GroupFull[];
+  groups: GroupFull[]; // ส่งมาแบบกรองกลุ่มลับออกแล้วจาก parent
   required?: boolean; // โชว์ * หลัง "ราคา" (ClaimSheet บังคับ, AddItemSheet ไม่บังคับ)
 }) {
   return (
@@ -57,23 +61,29 @@ export default function PaySplitFields({
       <label className="label mt">วิธีหาร</label>
       <div className="toggle">
         <div
-          className={`opt ${splitMode === "all" ? "active" : ""}`}
-          onClick={() => onSplitMode("all")}
+          className={`opt ${mode === "all" ? "active" : ""}`}
+          onClick={() => onMode("all")}
         >
           หารทั้งห้อง
         </div>
         <div
-          className={`opt ${splitMode === "group" ? "active" : ""} ${
+          className={`opt ${mode === "group" ? "active" : ""} ${
             groups.length === 0 ? "disabled" : ""
           }`}
-          onClick={() => groups.length > 0 && onSplitMode("group")}
+          onClick={() => groups.length > 0 && onMode("group")}
         >
           เฉพาะกลุ่ม
+        </div>
+        <div
+          className={`opt ${mode === "people" ? "active" : ""}`}
+          onClick={() => onMode("people")}
+        >
+          เลือกคน
         </div>
       </div>
 
       {/* โชว์รายการกลุ่มเฉพาะตอนเลือก "เฉพาะกลุ่ม" */}
-      {splitMode === "group" && (
+      {mode === "group" && (
         <div className="check-list">
           {groups.length === 0 && (
             <p className="muted small">ยังไม่มีกลุ่ม — สร้างกลุ่มก่อน</p>
@@ -86,6 +96,22 @@ export default function PaySplitFields({
             >
               <span className="box" />
               {g.name} <span className="muted">({g.members.length})</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* โชว์รายชื่อสมาชิกเฉพาะตอนเลือก "เลือกคน" — ติ๊กคนที่จะหารร่วม */}
+      {mode === "people" && (
+        <div className="check-list">
+          {members.map((m) => (
+            <div
+              key={m.id}
+              className={`chk ${userIds.includes(m.id) ? "on" : ""}`}
+              onClick={() => onToggleUser(m.id)}
+            >
+              <span className="box" />
+              {m.name}
             </div>
           ))}
         </div>

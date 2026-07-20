@@ -1,5 +1,8 @@
 // types ตรงกับ response ของ backend (ดู backend/CLAUDE.md)
 
+// โหมดหารฝั่ง UI — "people" เป็นของ frontend ล้วน (ยิง API เป็น splitMode:"group" + userIds)
+export type SplitUiMode = "all" | "group" | "people";
+
 export type Room = {
   id: string;
   code: string;
@@ -21,6 +24,7 @@ export type GroupFull = {
   id: string;
   name: string;
   roomId: string;
+  isCreatedByItem: boolean; // true = กลุ่มลับที่ระบบสร้างตอนเลือกคน (ไม่โชว์เป็นกลุ่มปกติ)
   members: { userId: string; name: string }[];
 };
 
